@@ -1,0 +1,570 @@
+---
+title: "London Transport 2024 - Initiatives, Public Communication and Public Transport Usage"
+author: "Ella Vacic"
+date: "`r format(Sys.time(), '%a/%d/%b')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Overview
+
+Despite efforts by the Greater London Authority to promote public transport usage, challenges remain. This report presents new data to understand the correlation between public transport initiatives, public communication of such initiatives and Londoners' usage of public transport. Primary data, collected from Transport for London (TfL) 2024 press releases, is merged with secondary data from the UK Government outlining daily use of transport modes. The primary data offers insights into government initiatives implemented in relation to transport, as TfL is government-owned, and the manner in which these are communicated with the public; the secondary data provides a broader context of public transport usage in the UK. When compiled, the final dataset allows for a comprehensive analysis of the relationship between government initiatives, public communication, and public transport usage.
+
+## 2. TfL Press Releases 2024 - London public transport initiatives and communication
+
+Below, press releases from 2024 are scraped from the TfL website as raw text files. 
+
+```{r load_libraries, message=FALSE, warning=FALSE}
+# Load all necessary libraries
+library(tidyverse)
+library(rvest)
+library(stringr)
+library(RSelenium)
+library(httr)
+library(readr)
+library(dplyr)
+library(lubridate)
+library(tidyr)
+library(quanteda)
+library(ggplot2)
+library(knitr)
+library(patchwork)
+```
+
+```{r create_folders}
+# Create a folder to store the data
+data_folder <- "data/"
+# Check if the folder exists and create it if necessary
+if(!dir.exists(data_folder)) { dir.create(data_folder) }
+
+# Create subfolder for text files
+subfolder <- paste0(data_folder, "tfl_press_releases_2024")
+# Check if the folder exists and create it if necessary
+if(!dir.exists(subfolder)) { dir.create(subfolder) }
+```
+
+```{r open_browser}
+# Set URL for the TfL 2024 press releases page
+tfl_url_2024 <- "https://tfl.gov.uk/info-for/media/press-releases/2024"
+
+# Start the Selenium server
+rD <- rsDriver(browser=c("firefox"), verbose = FALSE,
+               port = netstat::free_port(random = TRUE))
+
+# Create a client
+driver <- rD$client
+
+# Navigate to the TfL press releases page
+driver$navigate(tfl_url_2024)
+Sys.sleep(2)
+
+# Accept cookies
+accept_button <- driver$findElement(using = "xpath", 
+                                      '//*[(@id = "CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll")]//strong')
+Sys.sleep(2)
+accept_button$clickElement()
+Sys.sleep(2)
+```
+
+```{r scrape_press_releases, message=FALSE, warning=FALSE}
+# Define the list of month names
+months <- c("january", "february", "march", "april", "may", "june", 
+            "july", "august", "september", "october", "november", "december")
+
+# Check if there are files in the subfolder
+if (length(list.files(subfolder)) == 0) {
+  
+  # If there are no files, run the code
+  for (i in 1:12) {
+  
+  # Concstruct the url for that specific month, to later navigate back to it
+  month_url <- paste0("https://tfl.gov.uk/info-for/media/press-releases/2024/", months[i])
+
+  # Attempt to click close button for the survey popup
+  tryCatch({
+    survey_close <- driver$findElement(using = "xpath", '//xpath-to-close-survey-button')
+    Sys.sleep(2)
+    survey_close$clickElement()
+    Sys.sleep(2)
+    }, error = function(e) {
+      # Do nothing if the popup doesn't appear
+      })
+  
+  # Navigate to the constructed URL
+  driver$navigate(month_url)
+  Sys.sleep(2)
+  
+  # Read the page source
+  month_page_source <- driver$getPageSource()[[1]]
+  Sys.sleep(2)
+  month_page_html <- read_html(month_page_source)
+  
+  # Count the number of press releases
+  plain_button_count <- month_page_html %>%
+    html_elements(css = ".plain-button") %>%
+    length()
+  
+  # Navigate to the press release page
+  for (j in 1:plain_button_count) {
+    
+    # Skip the 4th press release on the 3rd month as the page is unavailable
+    if (i == 3 && j == 4) {
+      next
+      }
+    
+    # Attempt to click close button for the survey popup
+    tryCatch({
+      survey_close <- driver$findElement(using = "xpath", '//xpath-to-close-survey-button')
+      Sys.sleep(2)
+      survey_close$clickElement()
+      Sys.sleep(2)
+      }, error = function(e) {
+        # Do nothing if the popup doesn't appear
+        })
+    
+    # Identify and click the css selector for the press release button
+    press_release_css_selector <- paste0(".vertical-button-container:nth-child(", j, ") .plain-button")
+    press_release <- driver$findElement(using = "css selector", 
+                                          press_release_css_selector)
+    Sys.sleep(2)
+    press_release$clickElement()
+    Sys.sleep(2)
+    
+    # Read the page source
+    press_page_source <- driver$getPageSource()[[1]]
+    Sys.sleep(2)
+    press_page_html <- read_html(press_page_source) 
+    
+    # Extract the press release text
+    press_release <- press_page_html %>%
+      html_elements(css = "#full-width-content") %>%  
+      html_text()
+    
+    # Save the press release to a file
+    file_name <- paste0(months[i], "-", j ,".txt")
+    
+    # Save the file in the subfolder folder created earlier
+    writeLines(press_release, file.path(subfolder, file_name))
+    
+    # Navigate back to the page with all press releases for that month
+    # Navigate to the constructed URL
+    driver$navigate(month_url)
+    Sys.sleep(2)
+    }
+  
+  # Go back to the page with all months
+  driver$navigate(tfl_url_2024)
+  Sys.sleep(2)
+  }
+}
+```
+
+```{r close_browser, warning = FALSE, message = FALSE}
+# Close the browser
+driver$close()
+
+# Stop the Selenium server
+rD$server$stop()
+```
+
+The code above is in line with the guidelines and legal requirements of the TfL website set out in their T&C and robots.txt file. To avoid overloading servers or users being blocked from the website, a delay of 2 seconds, replicating human speed, occurs between requests to ensure an acceptable amount of requests are made over time.
+
+## 3. UK Government data - London transport usage
+
+Data on daily domestic transport use across transport modes, each represented as a percentage of the respective transport mode usage levels a few years ago (pre-covid), is collected from the UK Government Open Data Portal. This data supplements that collected above by providing insight into real-life responses to TfL communications, and as such the initiatives implemented by the Greater London Authority, accurate to the day.
+
+```{r searching_datasets}
+# Define the endpoint, given by the API documentation
+endpoint <- "https://data.gov.uk/api/action/"
+
+# Search for relevant datasets, following parameters given by the API documentation
+query <- "road-traffic"
+organization <- "organization:department-for-transport"
+# Make the request
+response <- GET(paste0(endpoint, "package_search?q=", query, "&fq=", organization))
+# Parse the response
+search_results <- content(response, "parsed")
+# Upon inspection, the second result is the desired id
+dataset_id <- search_results$result$results[[1]]$name
+
+# Investigate a specific dataset, following parameters given by the API documentation
+# Make the request
+response <- GET(paste0(endpoint, "package_show?id=", dataset_id))
+# Parse the response
+dataset_info <- content(response, "parsed")
+# Save the desired data URL, which is the 6th resource
+data_url <- dataset_info$result$resources[[2]]$url
+```
+
+```{r extract_link, warning = FALSE, message = FALSE}
+# Extract the download link using RSelenium
+# Start the Selenium server
+rD <- rsDriver(browser=c("firefox"), verbose = FALSE,
+               port = netstat::free_port(random = TRUE))
+
+# Create a client
+driver <- rD$client
+
+# Navigate to the data page URL
+driver$navigate(data_url)
+Sys.sleep(10)
+
+# Identify and click the dataset info page link
+dataset_info_link <- driver$findElement(using = "css selector", 
+                                    "li:nth-child(1) strong .govuk-link")
+Sys.sleep(10)
+dataset_info_link$clickElement()
+Sys.sleep(10)
+
+# Identify and click on the dataset link
+data_link <- driver$findElement(using = "css selector", 
+                                 ".govuk-\\!-margin-bottom-6~ .govuk-\\!-margin-bottom-6+ .govuk-\\!-margin-bottom-6 .gem-c-attachment__metadata .govuk-link")
+
+Sys.sleep(10)
+data_link$clickElement()
+Sys.sleep(10)
+
+# Extract the download link
+dataset_download_url <- driver$getCurrentUrl()
+
+# Close the browser
+driver$close()
+rD$server$stop()
+```
+
+```{r get_data, warning = FALSE, message = FALSE}
+# Clean the download URL
+dataset_download_url <- dataset_download_url[[1]]
+dataset_download_url <- str_remove(dataset_download_url, "/preview$")
+
+# Get the file path from the URL
+data_file <- str_extract(dataset_download_url, "([^/]+)$") 
+data_file <- paste0(data_folder, data_file) 
+
+# Download the file
+if(!file.exists(data_file)) { download.file(dataset_download_url, data_file) }
+
+# Read the data in the data folder
+daily_transport_use_data <- read_csv("data/full_data_clean.csv")
+```
+
+As per the documentation, no API key is required to collect data from the UK Government Open Data Portal, making the data collection reproducible by others. To make API requests, the official endpoint given in documentation is used. Although there are no rate limits for the API, a delay of 10 seconds is added between requests when using RSelenium, as per the robots.txt file. Furthermore, the use of RSelenium is in compliance with relevant robots.txt files.
+
+## 4. London transport data 2024 - Compiling the data
+
+The raw text files are now cleaned to extract the desired information (date, title, body). The primary and secondary data are then merged into a single, tidy, tabular dataset.
+
+```{r parse_press_release_files}
+# Extract the desired information of each press release and put it into tabular format
+press_releases_files <- list.files(subfolder, full.names = TRUE)
+press_releases_data <- lapply(press_releases_files, readLines)
+
+# Function to extract desired information from each press release
+parse_file <- function(text_lines) {
+  #
+  # Takes a list of text lines as input
+  # Extracts the date, title, and body of the press release
+  # Returns a named list with the extracted information
+  #
+  
+  # Combine text lines into single string
+  text <- paste(text_lines, collapse = "\n")
+  
+  # Extract fields using regular expressions
+  new_date <- str_extract(text, "\\d{1,2} [A-Za-z]+ \\d{4}")
+  new_title <- str_extract(text, 
+                           "^[\\s\\S]*?(?=\\n \\n \\n \\n \\n \\n \\n \\n \\n \\n \\n \\n \\n \\n \\n \\n\\n \\n)")
+  new_title <- str_split(new_title, "\n")[[1]]
+  new_title <- tail(new_title, 1)
+  new_body <- str_match(text, 
+                        "\\d{1,2} [A-Za-z]+ \\d{4}\\s*\\n+\\s*([\\s\\S]*?)(?=\\n+\\s*Notes to Editor)")[, 2]
+  
+    if (is.na(new_body)) {
+    # You can decide what to do if body extraction fails:
+    # Option 1: Extract another part of the text as body (alternative method)
+    new_body <- str_match(text, 
+                          "\\d{1,2} [A-Za-z]+ \\d{4}\\s*\\n+\\s*([\\s\\S]*?)(?=\\n+\\s*Notes to editors)")[, 2]
+    
+    # Option 2: Set a default value for the body if extraction fails
+    if (is.na(new_body)) {
+      new_body <- str_match(text, "\\d{1,2} [A-Za-z]+ \\d{4}\\s*\\n+\\s*([\\s\\S]*?)(?=\\n+\\s*Media navigation)")[, 2]
+    }
+  }
+  
+  # Return as a named list
+  list(full_date = new_date, 
+       title = new_title, 
+       body = new_body)
+}
+
+# Apply the function to all press releases
+press_releases_parsed <- lapply(press_releases_data, parse_file)
+
+# Convert to a data frame
+tfl_data <- bind_rows(press_releases_parsed)
+```
+
+```{r merge_data}
+# Turn dates in TfL data into date format to merge on date
+tfl_data <- tfl_data %>%
+  mutate(date = dmy(full_date)) %>%
+  select(-full_date)
+
+# Turn dates in daily transport use data into date format to merge on date
+daily_transport_use_data <- daily_transport_use_data %>%
+  mutate(date = dmy(date))
+
+# Merge the TfL data with the daily transport use data 
+london_transport_data <- tfl_data %>%
+  left_join(daily_transport_use_data, by = c("date" = "date"), relationship = "many-to-many")
+
+# Pivot the data to a tidy format without NA column
+london_transport_data <- london_transport_data %>%
+  pivot_wider(names_from = "transport_type", values_from = "value") %>%
+  # Sort the data by date
+  arrange(date)
+```
+
+Five additions/transformations are made to the final dataset to facilitate potential analyses: 1) indication of the month of each row, 2) indication of the weekday of each row, 3) monthly averages, 4) monthly proportions, 5) mean pairwise cosine similarities. Further explanations are provided below.
+
+```{r create_month_variable}
+# First transformation
+london_transport_data <- london_transport_data %>%
+  mutate(month = month(date, label = TRUE)) %>%
+  # Place variable in desired position 
+  select(date, month, title, body, everything())
+```
+
+The code above adds a variable indicating the month to the dataset, and reorders the dataset to place it in the desired position.
+
+```{r create_day_variable}
+# Second transformation
+london_transport_data <- london_transport_data %>%
+  mutate(day = wday(date, label = TRUE)) %>%
+  # Place variable in desired position
+  select(date, day, month, title, body, everything())
+```
+
+A variable is added to indicate the day of the week, as this has an effect on average transport usage. The variable is then placed in the desired position in the dataset.
+
+```{r calculate_monthly_proportions, warning = FALSE, message = FALSE}
+# Third transformation
+# Calculate monthly averages
+averages <- london_transport_data %>%
+  group_by(month) %>%
+  summarise(across(c(cars:national_rail_noCR), mean, na.rm = TRUE)) %>%
+  mutate(across(-month, .names = "{.col}_avg")) %>%
+  select(-"cars", -"light_commercial_vehicles", -"heavy_goods_vehicles", -"all_motor_vehicles", -"tfl_tube", -"tfl_bus", -"bus_excluding_london", -"national_rail", -"national_rail_noCR")
+
+# Join with original data and compute deviations
+london_transport_data <- london_transport_data %>%
+  full_join(averages, by = "month") %>%
+  # Add a variable representing the proportion of each transport type compared to its monthly average
+  mutate(
+    cars_monthly_prop = cars / cars_avg,
+    light_commercial_vehicles_monthly_prop = light_commercial_vehicles / light_commercial_vehicles_avg,
+    heavy_goods_vehicles_monthly_prop = heavy_goods_vehicles / heavy_goods_vehicles_avg,
+    all_motor_vehicles_monthly_prop = all_motor_vehicles / all_motor_vehicles_avg,
+    tfl_tube_monthly_prop = tfl_tube / tfl_tube_avg,
+    tfl_bus_monthly_prop = tfl_bus / tfl_bus_avg,
+    bus_excluding_london_monthly_prop = bus_excluding_london / bus_excluding_london_avg,
+    national_rail_monthly_prop = national_rail / national_rail_avg,
+    national_rail_noCR_monthly_prop = national_rail_noCR / national_rail_noCR_avg
+  ) %>%
+  select(-ends_with("_avg"))
+```
+
+As average transport usage can vary by month, the code above adds monthly averages for each transport type and calculates the proportion of each transport type relative to the average. This allows for a more accurate comparison of transport usage across months.
+
+```{r calculate_yearly_proportions}
+# Fourth transformation
+
+# Calculate yearly averages
+yearly_averages <- london_transport_data %>%
+  summarise(across(c(cars:national_rail_noCR), mean, na.rm = TRUE)) %>%
+  mutate(across(everything(), .names = "{.col}_avg")) %>%
+  select(-"cars", -"light_commercial_vehicles", -"heavy_goods_vehicles", -"all_motor_vehicles", -"tfl_tube", -"tfl_bus", -"bus_excluding_london", -"national_rail", -"national_rail_noCR")
+
+# Join with original data and compute proportions
+london_transport_data <- london_transport_data %>%
+  bind_cols(yearly_averages) %>%
+  # Add a variable representing the proportion of each transport type compared to its yearly average
+  mutate(
+    cars_yearly_prop = cars / cars_avg,
+    light_commercial_vehicles_yearly_prop = light_commercial_vehicles / light_commercial_vehicles_avg,
+    heavy_goods_vehicles_yearly_prop = heavy_goods_vehicles / heavy_goods_vehicles_avg,
+    all_motor_vehicles_yearly_prop = all_motor_vehicles / all_motor_vehicles_avg,
+    tfl_tube_yearly_prop = tfl_tube / tfl_tube_avg,
+    tfl_bus_yearly_prop = tfl_bus / tfl_bus_avg,
+    bus_excluding_london_yearly_prop = bus_excluding_london / bus_excluding_london_avg,
+    national_rail_yearly_prop = national_rail / national_rail_avg,
+    national_rail_noCR_yearly_prop = national_rail_noCR / national_rail_noCR_avg
+  ) %>%
+  # Remove yearly averages from dataset
+  select(-ends_with("_avg"))
+```
+
+```{r text_similarity_analysis}
+# Fifth transformation
+# Function to compute similarities
+pairwise_cosine_similarities <- function(dfm) {
+  # 
+  # Takes a target document ID and a DFM as input
+  # Calculates pairwise cosine similarities between each press release pair
+  # Returns a matrix of similarities
+  #
+  dfm <- dfm / sqrt(rowSums(dfm^2))
+  similarities_output <- dfm %*% t(dfm)
+  return(similarities_output)
+}
+
+# Create a Document-Feature Matrix (DFM) from the press releases
+dfm_data <- london_transport_data %>%
+  corpus(text_field = "body") %>%
+  tokens(remove_punct = TRUE, remove_numbers = TRUE) %>%
+  tokens_remove(stopwords("en")) %>%
+  tokens_wordstem() %>%
+  dfm() %>%
+  dfm_trim(min_termfreq = 2)
+
+# Calculate pairwise cosine similarities for all press releases
+similarities <- pairwise_cosine_similarities(dfm_data)
+
+# Convert the result to a matrix
+similarities <- similarities %>% 
+  as.matrix()
+
+# Calculate the mean similarity for each press release
+similarities <- rowMeans(similarities, na.rm = TRUE)
+
+# Add a variable representing the mean similarities
+london_transport_data <- london_transport_data %>%
+  mutate(mean_text_similarity = similarities) %>%
+  select(date, month, title, body, mean_text_similarity, everything())
+```
+
+The code above calculates pairwise cosine similarities between all press releases using a document-feature matrix. The mean similarity for each press release is then calculated and added as a new variable to the dataset.
+
+## 5. London Transport Data 2024 - Introduction to the data
+
+The London Transport Data 2024 includes variables indicating the date, month, and day of the week, as well as the title and body of each press release, and daily transport usage across various transport types, each represented as a percentage of the respective transport mode's pre-covid levels, and as proportions of the monthly average. The dataset is tidy, with each row representing a unique date.
+
+```{r summarise_data}
+# Summarise (mean, median, maximum, and minimum) each transport type and press release similarities
+summary_data <- london_transport_data %>%
+  summarise(
+    across(
+      c(cars:national_rail_noCR, mean_text_similarity),
+      list(Mean = mean, Median = median, Maximum = max, Minimum = min),
+      na.rm = TRUE
+    )
+  ) %>%
+  # Pivot the data to a tidy format
+  pivot_longer(
+    cols = everything(),
+    names_to = c("Variable", "Statistic"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  pivot_wider(
+    names_from = Statistic,
+    values_from = value
+  )
+
+# Print the summary data
+print(summary_data)
+```
+
+The summary data above provides an overview of the mean, median, maximum, and minimum values for each transport type (represented as a change from pre-covid transport usage levels) and the mean pairwise cosine similarities between press releases for the year 2024. This acts as a brief introduction to the key variables and values. For instance, it appears that press releases differ quite significantly on average. We can also see that TfL bus usage has decreased, and tube usage even more so, since the baseline levels were recorded.
+
+```{r plot_transport_over_time}
+# Plot the usage of tfl tubes over time
+tube_plot <- ggplot(london_transport_data %>% filter(!is.na(tfl_tube)), aes(x = date)) +
+  geom_line(aes(y = tfl_tube_monthly_prop), linewidth = 0.7) +
+  labs(title = "TfL Tube usage over time", x = "Date", y = "Usage (relative to pre-covid)")+
+  scale_y_continuous(labels = scales::percent)
+
+# Plot the usage of tfl buses over time
+bus_plot <- ggplot(london_transport_data %>% filter(!is.na(tfl_bus)), aes(x = date)) +
+  geom_line(aes(y = tfl_bus_monthly_prop), linewidth = 0.7) +
+  labs(title = "TfL Bus usage over time", x = "Date", y = "Usage (relative to pre-covid))") +
+  scale_y_continuous(labels = scales::percent)
+
+# Plot the usage of cars in the UK over time
+car_plot <- ggplot(london_transport_data %>% filter(!is.na(cars)), aes(x = date)) +
+  geom_line(aes(y = cars_monthly_prop), linewidth = 0.7) +
+  labs(title = "Car usage over time", x = "Date", y = "Usage (relative to pre-covid)") +
+  scale_y_continuous(labels = scales::percent)
+
+# Plot the usage of the national rail over time
+rail_plot <- ggplot(london_transport_data %>% filter(!is.na(bus_excluding_london)), aes(x = date)) +
+  geom_line(aes(y = bus_excluding_london_monthly_prop), linewidth = 0.7) +
+  labs(title = "Bus excluding LDN usage over time", x = "Month", y = "Usage (relative to pre-covid)") +
+  scale_y_continuous(labels = scales::percent)
+
+# Combine the plots
+transport_plot <- 
+  tube_plot + 
+  bus_plot + 
+  car_plot + 
+  rail_plot + 
+  plot_layout(ncol = 2) 
+
+# Print the final plot
+print(transport_plot)
+```
+
+The plots above demonstrate the trends in public transport usage in London and the UK over time, represented as percentages of their monthly averages (of usage levels compared to pre-covid). For instance, the plots reveal that transport usage is low at the very start of January compared to the rest of the month, but this is true for cars and buses outside of London as well as TfL tubes and buses. This allows for a visual comparison of the trends in transport usage over time.
+
+```{r plot_text_similarity}
+# Plot the mean text similarities over time
+text_plot <- ggplot(london_transport_data %>% filter(!is.na(mean_text_similarity)), aes(x = date)) +
+  geom_line(aes(y = mean_text_similarity), size = 0.7) +
+  labs(title = "Mean Pairwise Cosine similarities by month", x = "Month", y = "Mean pairwise cosine similarities")
+
+print(text_plot)
+```
+
+The above plot displays the mean pairwise cosine similarities of TfL press releases for each month of 2024, providing insights into changes in public communication of initiatives over time, as measured by the mean pairwise cosine similarities between press releases. As such, the plot visually demonstrates the press releases.
+
+## 6. London Transport Data 2024 - Accessing the data
+
+The London Transport Data 2024, raw TfL text files, Government data, summary data and plots above are stored locally. Code to download the text files and Government data is provided in sections 2 and 3. Code to download the final dataset and outputs from section 5 is provided below. The code organises data into folders as desired. Furthermore, all data is stored remotely on GitHub.
+
+```{r create_outputs_folder}
+# Create subfolder for text files
+outputs_subfolder <- paste0(data_folder, "outputs/")
+# Check if the folder exists and create it if necessary
+if(!dir.exists(outputs_subfolder)) { dir.create(outputs_subfolder) }
+```
+
+```{r save_final_dataset}
+# Save the final dataset
+final_data_file <- paste0(data_folder, "london_transport_data_2024.csv")
+# Save the final dataset if it is not already saved
+if(!file.exists(final_data_file)) { write_csv(london_transport_data, final_data_file) }
+```
+
+```{r save_summary_data}
+# Save the summary data
+summary_data_file <- paste0(outputs_subfolder, "summary_data.csv")
+# Save the summary data if it is not already saved
+if(!file.exists(summary_data_file)) { write_csv(summary_data, summary_data_file) }
+```
+
+```{r save_transport_plot}
+# Save the plot
+transport_plot_file <- paste0(outputs_subfolder, "transport_plot.png")
+# Save the plot if it is not already saved
+if(!file.exists(transport_plot_file)) { ggsave(transport_plot_file, transport_plot, width = 12, height = 8) }
+```
+
+```{r save_text_plot}
+# Save the plot
+text_plot_file <- paste0(outputs_subfolder, "text_similarities_plot.png")
+# Save the plot if it is not already saved
+if(!file.exists(text_plot_file)) { ggsave(text_plot_file, text_plot, width = 12, height = 8) }
+```
+
