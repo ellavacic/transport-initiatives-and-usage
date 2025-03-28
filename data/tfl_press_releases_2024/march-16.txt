@@ -1,0 +1,270 @@
+
+ You are here:
+ 
+ 
+ Home
+ 
+ 
+ 
+ 
+ Media
+ 
+ 
+ 
+ Press releases
+ 
+ 
+ 
+ 2024
+ 
+ 
+ 
+ March
+ 
+ 
+ 
+ New generation of iBus set to enhance bus travel in London
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ New generation of iBus set to enhance bus travel in London
+ 
+ 04 March 2024
+ 
+ 
+
+
+ 
+
+ 
+ New £160m iBus contract signed, replacing system that has been operating for 17 years and introducing new technology
+ 
+ 
+
+
+
+
+ "Improving London's transport network and making public transport more attractive for Londoners is a core aim of the Mayor's and key to his commitment to have 80% of journeys made using public transport by 2040"
+ 
+ Seb Dance
+ Deputy Mayor for Transport
+ 
+
+
+ 
+Reliability and accuracy of real-time passenger information set to be enhanced by increased information on disruptions and diversions
+Since being introduced in 2007, the iBus system has made the bus network easier to use and boosted reliability
+Transport for London (TfL) has today awarded a £160m contract over 10 years for the replacement of the existing Automatic Vehicle Location system (iBus) to INIT, an organisation with a global track record of supporting transport companies in making public transport more attractive, faster, and efficient. As part of the contract, INIT will provide both the replacement of on-board hardware and the back-office services for all buses in the TfL vehicle fleet. The current system, operated by Trapeze, has been in operation across London buses for seventeen years.
+
+The next generation of iBus will provide new service control tools for Bus Operators, and will integrate with the current voice radio system, payments and performance management systems, leading to improved service reliability and information provision for customers.
+
+The new iBus system will also build on the success of the current system, with reliability and accuracy of real-time passenger information set to be enhanced further by including disruption and diversion information both on and off the bus. This will be made available to customers via the bus customer information boards and audio-visual announcements, and on the TfL Go app immediately after disruption affects a bus, allowing customers quick access to up-to-date information in order to make informed decisions on how to get from A to B. The information could include details on the route of the diversion and where the buses re-join their original routes.
+
+Customers will also benefit through improved accuracy of arrival information, especially for the early stops on a route, by using data from journeys taken earlier in the day, better reflecting the impact of recent traffic conditions. The new system will also allow TfL to maintain more reliable information for third party apps used for journey planning. The new technology will also offer safety enhancements through issuing hazard warnings to drivers for tight turns or narrow roads.
+
+The current iBus system provides real-time journey information for customers and has made the bus network easier to use and more accessible for all. It has particularly benefited passengers with hearing or visual impairments, who previously may have had to rely on familiarity of a route or assistance from the bus driver to ensure they didn't miss their stop. The current system also allows TfL to warn customers of planned disruption such as major events, to encourage them to plan their travel in advance. Through a combination of technologies, including GPS, iBus has also helped bus operators pinpoint the exact location of buses at any time which helps bus controllers to regulate the service and prevents customers waiting for a long time for a bus and three coming along at once.
+
+Once implemented, bus operators will benefit from the new generation iBus with the ability to change the iBus equipment themselves. This new model will reduce the amount of time that vehicles are out of service and waiting for a repair to be booked in.    
+
+Since March 2023, TfL has been installing a wave of new bus Countdown boards across every borough in the capital. More than 300 additional signs have been installed to date, boosting the overall number of boards to almost 3000 displays, more than any other UK authority. The signs remain a simple and reliable way of helping Londoners get around by bus. Other improvements to customer information on the bus network include trialling of new display types and content for giving customers enriched information about their journey, and the introduction of TfL Go, that gives customers personalised information relevant to their planned and regular journeys.   
+
+TfL has set out a bold vision for buses in the capital in its Bus Action Plan, which sets out how London's modern bus network will attract more customers and help the capital become net zero by 2030. Buses are already the most used form of public transport in the capital, and TfL - via its Bus Action Plan - is working to create an even more attractive alternative to car use by focusing on the experience for all customers, safety and security, faster journeys, improved connections, and decarbonisation and climate resilience. There are already more than 1,300 zero emission buses out on the city's streets, with plans for the whole fleet to be converted by 2030, subject to Government funding. Converting London's bus fleet to zero-emission by 2030 will save an estimated 5.5m tonnes of carbon.   
+
+Seb Dance, Deputy Mayor for Transport, said: "Improving London's transport network and making public transport more attractive for Londoners is a core aim of the Mayor's and key to his commitment to have 80% of journeys made using public transport by 2040.
+
+"This next iteration of the iBus technology will make journeys more reliable and give customers more accurate and up-to-date travel information, enabling Londoners to travel with ease, and helping to build a better, greener city for everyone."
+
+Rebecca Bissell, TfL's Director of Information Technology, said: "We are very pleased to have awarded the contract for the next generation of iBus to INIT. Since being introduced, the iBus system has transformed our customers' journeys, and particularly helped people with visual or hearing impairments, by making it easier to navigate London. The solutions provided by INIT for the next generation of iBus will help us build on this success as we continue to enhance the safety and reliability of our service through improved real-time information for our operators and customers."  
+
+Jens Mullak, INIT Limited's Managing Director, said: "We are very proud to be selected by TfL as the supplier for the next generation of the iBus system. This confirms that our long-term technology strategy has been positively recognised. The new system will have a modular open technology platform that is scalable and accommodates TfL's future development ambitions. We are delighted that TfL joins our existing customer group of more than 1,100 public transport organizations worldwide. Our team is looking forward to working with TfL to deliver a world-class on-bus hardware and back office solution for London."
+
+Jon Eardley, Managing Director of Transport UK London Bus, formerly Abellio London, said: "As a TfL operator, we are excited to see the award of this contract and the improvements the new technology will bring to our staff and customers. When it was launched, the current iBus system transformed journeys for customers and operators alike. The next generation of iBus will further enhance real-time information and integrate seamlessly with other business systems to provide a platform for growth in the bus network. The new system will vastly improve our driver's experience of service control to allow them to continue to provide our customers with the very best service with millions of safe, reliable and sustainable journeys across the capital every year."
+
+Clive Wood, Lead Regional Policy and Campaigns Manager at Guide Dogs, said: "Having accessible real time information when using the London bus network helps blind and partially sighted people travel independently and with confidence. This is particularly important at times when there is disruption or bus diversions. I know from my own experience that being able to access information to plan my journey and to hear those reassuring announcements on the bus makes all the difference. There are an estimated 217,000 people living with sight loss in London which is expected to increase to 264,000 by 2032 as well as thousands who visit our capital. Having accessible information for the bus network makes all the difference."
+
+The current iBus system supports over 8,000 buses running around 700 bus routes and serving over 19,000 bus stops across Greater London. The system also supports around 80 bus garages, operated by 8 bus operators, responsible for running and maintaining the bus service schedule, and 42 bus operator service control centres, with workstations with the ability to track buses in real time and contact buses by voice radio.  
+
+ENDS
+
+Notes to Editor:
+
+About INIT: As a worldwide leading supplier of integrated planning, dispatching, telematics and ticketing systems for buses, trams and trains, INIT has been assisting transport companies in making public transport more attractive, reliable and more efficient for more than 40 years. Third-party systems can also be easily integrated thanks to open and standardised interfaces. An excellent package of operational services completes the INIT offering. Today, worldwide more than 1,100 transport authorities and providers rely on INIT´s innovative hard- and software solutions.
+
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+ 
+ Media navigation
+ 
+ Press releases
+ 2025
+ 
+ 
+ 2024
+ January
+ 
+ 
+ February
+ 
+ 
+ March
+ April
+ 
+ 
+ May
+ 
+ 
+ June
+ 
+ 
+ July
+ 
+ 
+ August
+ 
+ 
+ September
+ 
+ 
+ October
+ 
+ 
+ November
+ 
+ 
+ December
+ 
+ 
+ 
+ 
+ 2023
+ 
+ 
+ 2022
+ 
+ 
+ 2021
+ 
+ 
+ 2020
+ 
+ 
+ 2019
+ 
+ 
+ 2018
+ 
+ 
+ 2017
+ 
+ 
+ 2016
+ 
+ 
+ 2015
+ 
+ 
+ 2014
+ 
+ 
+ 2013
+ 
+ 
+ 2012
+ 
+ 
+ 2011
+ 
+ 
+ 2010
+ 
+ 
+ 2009
+ 
+ 
+ 2008
+ 
+ 
+ 2007
+ 
+ 
+ 2006
+ 
+ 
+ 2005
+ 
+ 
+ 2004
+ 
+ 
+ 
+ 
+ Photos
+ 
+ 
+ Contact the Press Office
+ 
+ 
+ Filming & photography
+ 
+ 
+ 
+
+
+
+ 
+ 
+
+
+
+ 
+ 
+ 
+
+
+
+
+ 
+ 
+ 
+ 
+
+ 
+ 
+
+
+ 
+
+
+        
+    
